@@ -1,0 +1,6 @@
+**/.venv
+**/.vscode
+**/*.egg-info
+pyproject.toml
+poetry.lock
+**/*.pyc
