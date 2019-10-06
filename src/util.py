@@ -34,12 +34,31 @@ class Util:
             as_dict=True,
         )["elmo"]
 
-
+#sentences is a list where the ith element is a list of the sentences of the ith paragraph in the article
+#tokens is a list where each element is the list of tokens from a sentence
+#tagged_tokens is a list where each element is a list of tuples of the following form: (token, pos tag) that corresponds to a sentence
+#entities is a list where each element is a list of tuples of the following form: (entity, label) that corresponds to a sentence
 class Article:
     def __init__(self, article):
-        self.tokens = nltk.word_tokenize(article)
-        self.tagged_tokens = nltk.pos_tag(self.tokens)
-        self.entities = nltk.chunk.ne_chunk(self.tagged_tokens)
+	self.sentences = []
+	self.tokens = []
+	self.tagged_tokens = []
+	self.entities = []
+	for element in article:
+		if element[0] == 'p':
+			paragraph_sents = nltk.sent_tokenize(element[1])
+			sentences.append(paragraph_sents)
+			for sentence in paragraph_sents:
+				token = nltk.word_tokenize(sentence)
+				tagged_token = nltk.pos_tag(token)
+				entity = nltk.chunk.ne_chunk(tagged_token)
+				self.tokens.append(token)
+				self.tagged_tokens.append(tagged_token)
+				entity_list = []
+				for chunk in entity:
+					if hasattr(chunk, 'label'):
+						entity_list.append((' '.join(c[0] for c in chunk), chunk.label()))
+				self.entities.append(entity_list)
 
         return
 
