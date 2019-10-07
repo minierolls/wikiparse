@@ -34,12 +34,18 @@ class Util:
             as_dict=True,
         )["elmo"]
 
-#sentences is a list where the ith element is a list of the sentences of the ith paragraph in the article
-#tokens is a list where each element is the list of tokens from a sentence
-#tagged_tokens is a list where each element is a list of tuples of the following form: (token, pos tag) that corresponds to a sentence
-#entities is a list where each element is a list of tuples of the following form: (entity, label) that corresponds to a sentence
+
 class Article:
     def __init__(self, article):
+	"""
+	Initializes an Article with the following fields:
+	sentences: A list where the ith element is the list of sentences in the ith paragraph
+	tokens: a list where the ith element is a list of token lists for the ith paragraph
+	tagged_tokens: a list where the ith element is a list of tagged token lists for the ith paragraph.
+		       A tagged token is a tuple of the form (token, tag)
+	entities: a list where the ith element is a list of entity lists for the ith paragraph.
+		  A entity is a tuple of the form (token, label)
+	"""
 	self.sentences = []
 	self.tokens = []
 	self.tagged_tokens = []
@@ -47,18 +53,24 @@ class Article:
 	for element in article:
 		if element[0] == 'p':
 			paragraph_sents = nltk.sent_tokenize(element[1])
-			sentences.append(paragraph_sents)
+			paragraph_tokens = []
+			paragraph_tagged_tokens = []
+			paragraph_entities = []
 			for sentence in paragraph_sents:
 				token = nltk.word_tokenize(sentence)
 				tagged_token = nltk.pos_tag(token)
 				entity = nltk.chunk.ne_chunk(tagged_token)
-				self.tokens.append(token)
-				self.tagged_tokens.append(tagged_token)
+				paragraph_tokens.append(token)
+				paragraph_tagged_tokens.append(tagged_token)
 				entity_list = []
 				for chunk in entity:
 					if hasattr(chunk, 'label'):
 						entity_list.append((' '.join(c[0] for c in chunk), chunk.label()))
-				self.entities.append(entity_list)
+				paragraph_entities.append(entity_list)
+			self.sentences.append(paragraph_sents)
+			self.tokens.append(paragraph_tokens)
+			self.tagged_tokens.append(paragraph_tagged_tokens)
+			self.entities.append(paragraph_entities)
 
         return
 
