@@ -118,6 +118,8 @@ class Util:
 
 
 class Article:
+    """Structured representation of an article."""
+
     def __init__(self, article):
         """
         Initializes an Article with the following fields:
@@ -156,7 +158,26 @@ class Article:
                 self.tagged_tokens.append(paragraph_tagged_tokens)
                 self.entities.append(paragraph_entities)
 
-        return
+    def search_token(self, token):
+        """
+        Returns a list of all sentences that contain the provided token.
+
+        Args:
+            token: A string query token
+
+        Returns:
+            A list of tuples of the form (par_index, sent_index, sentence)
+            where par_index is the index of the paragraph, sent_index is the
+            index of the sentence, and sentence is the string sentence.
+        """
+        out_list = []
+
+        for paragraph_index, paragraph in enumerate(self.sentences):
+            for sentence_index, sentence in enumerate(paragraph):
+                if token in sentence:
+                    out_list.append((paragraph_index, sentence_index, sentence))
+
+        return out_list
 
 
 if __name__ == "__main__":
