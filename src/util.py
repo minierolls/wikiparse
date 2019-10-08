@@ -129,7 +129,15 @@ class Article:
                     A tagged token is a tuple of the form (token, tag)
             entities: a list where the ith element is a list of entity lists for the ith paragraph.
                 A entity is a tuple of the form (token, label)
+
+        Args:
+            article: Loaded article from Util.load_article()
         """
+        nltk.download("punkt")
+        nltk.download("averaged_perceptron_tagger")
+        nltk.download("maxent_ne_chunker")
+        nltk.download("words")
+
         self.sentences = []
         self.tokens = []
         self.tagged_tokens = []

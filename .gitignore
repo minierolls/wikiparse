@@ -1,7 +1,9 @@
 **/.venv
 **/.vscode
 **/*.egg-info
-pyproject.toml
-poetry.lock
+**/pyproject.toml
+**/poetry.lock
 **/*.pyc
 **/__pycache__
+**/Pipfile
+**/Pipfile.lock
