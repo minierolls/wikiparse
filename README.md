@@ -1,7 +1,7 @@
 # wikiparse
 
-## Resources
+## Dependencies
 
-NLTK
-TensorFlow
-TensorFlow Hub
+- NLTK
+- TensorFlow
+- TensorFlow Hub
