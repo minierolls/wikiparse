@@ -57,6 +57,6 @@ class Question:
 
 if __name__ == "__main__":
     u = Util()
-    a = Article(u.load_article("articles/Development_data/set1/set1/a1.htm"))
+    a = Article(u.load_txt_article("articles/Development_data/set1/set1/a1.txt"))
     q = Question(a)
     print(q.generate(5))

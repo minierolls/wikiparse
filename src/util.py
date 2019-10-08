@@ -61,7 +61,26 @@ class Util:
             "https://tfhub.dev/google/tf2-preview/nnlm-en-dim128-with-normalization/1"
         )
 
-    def load_article(self, article_path):
+    def open_utf_file(self, file_path):
+        """
+        Open a UTF-8 encoded file and normalize.
+
+        Args:
+            file_path: Path to UTF-8 encoded file
+
+        Returns:
+            String representation of file
+        """
+        try:
+            f = open(article_path, "r", encoding="utf-8")
+            file_str = unicodedata.normalize("NFKD", f.read().strip())
+            f.close()
+        except:
+            return False
+        return file_str
+
+
+    def load_html_article(self, article_path):
         """
         Load and return an article saved in HTML format.
         Only the following tags will be parsed:
@@ -87,17 +106,48 @@ class Util:
         Returns:
             [(HTML Tag, Enclosed Text), (HTML Tag, Enclosed Text), ...] or False
         """
-        try:
-            f = open(article_path, "r", encoding="utf-8")
-            article_str = unicodedata.normalize("NFKD", f.read().strip())
-            f.close()
-        except:
+        article_str = self.open_utf_file(article_path)
+
+        if not article_str:
             return False
 
         parser = ArticleParser()
         parser.feed(article_str)
 
         return parser.parsed_content
+
+    def load_txt_article(self, article_path):
+        """
+        Load and return an article saved in TXT format. Content stored in the
+        article will be categorized by recognized patterns with HTML tags.
+
+        Args:
+            article_path: Path to article TXT file
+
+        Returns:
+            [(HTML Tag, Enclosed Text), (HTML Tag, Enclosed Text), ...] or False
+        """
+        article_str = self.open_utf_file(article_path)
+
+        if not article_str:
+            return False
+
+        article_out = []
+
+        # First line assumed to be article title
+        article_out.append(("h1", article_str.splitlines()[0]))
+
+        # Categorize article lines as paragraph or section header
+        for line in article_str.splitlines()[1:]:
+            if "." in line or "," in line:
+                article_out.append(("p", line))
+            else:
+                article_out.append(("h2", line))
+            # All content after "References" header is considered irrelevant
+            if line == "References":
+                break
+
+        return article_out
 
     def embeddings(self, sentences):
         """
@@ -206,7 +256,7 @@ class Article:
 
 if __name__ == "__main__":
     util = Util()
-    parsed_article = util.load_article("articles/Development_data/set1/set1/a1.htm")
+    parsed_article = util.load_txt_article("articles/Development_data/set1/set1/a1.txt")
     f = open("a1.txt", "w", encoding="utf-8")
     for segment in parsed_article:
         f.write(segment[1])

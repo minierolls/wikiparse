@@ -27,12 +27,12 @@ class Answer:
             Answer to question as string
         """
         question_embedding = u.embeddings([question])[0]
-        
+
         sentences_list = []
 
         for paragraph in art.sentences:
             sentences_list += paragraph
-        
+
         sentences_embeddings = u.embeddings(sentences_list)
 
         distances = []
@@ -49,8 +49,7 @@ class Answer:
 
 if __name__ == "__main__":
     u = Util()
-    art = Article(u.load_article("articles/Development_data/set1/set1/a1.htm"))
+    art = Article(u.load_txt_article("articles/Development_data/set1/set1/a1.txt"))
     a = Answer(art)
     q = "Who was the next great pyramid builder?"
     print(a.answer(q))
-
