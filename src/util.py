@@ -2,6 +2,7 @@ from html.parser import HTMLParser
 import unicodedata
 
 import nltk
+import numpy as np
 import tensorflow
 import tensorflow_hub
 
@@ -56,9 +57,8 @@ class Util:
         """
         Create a new instance of the Util class.
         """
-        tensorflow.compat.v1.disable_eager_execution()
-        self.embeddings_model = tensorflow_hub.Module(
-            "https://tfhub.dev/google/elmo/2", trainable=False
+        self.embeddings_model = tensorflow_hub.load(
+            "https://tfhub.dev/google/tf2-preview/nnlm-en-dim128-with-normalization/1"
         )
 
     def load_article(self, article_path):
@@ -99,22 +99,19 @@ class Util:
 
         return parser.parsed_content
 
-    def embeddings(self, tokens_sequence):
+    def embeddings(self, sentences):
         """
-        Return word embeddings for a provided sequence of tokens.
+        Return word embeddings for provided sequences of tokens.
 
         Args:
-            tokens_sequence: A list of tokens for which to find word embeddings
+            sentences: A list of sentence strings for which to find word embeddings
 
         Returns:
-            Word embeddings of provided token sequence
+            Word embeddings of provided sentences as NumPy array
         """
-        tokens_length = len(tokens_sequence)
-        return self.embeddings_model(
-            inputs={"tokens": tokens_sequence, "sequence_len": tokens_length},
-            signature="tokens",
-            as_dict=True,
-        )["elmo"]
+        tensors = self.embeddings_model(sentences)
+
+        return tensors.numpy()
 
 
 class Article:
