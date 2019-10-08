@@ -187,6 +187,25 @@ class Article:
 
         return out_list
 
+    def get_entities_of_type(self, entity_type):
+        """
+        Returns all entities of a specified type.
+
+        Args:
+            entity_type: Entity type string
+
+        Returns:
+            List of entities as strings
+        """
+        out_list = []
+
+        for paragraph in self.entities:
+            for sentence in paragraph:
+                for entity in sentence:
+                    if entity[1] == entity_type and entity[0] not in out_list:
+                        out_list.append(entity[0])
+        return out_list
+
 
 if __name__ == "__main__":
     util = Util()
