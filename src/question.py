@@ -1,4 +1,4 @@
-from util import Article, Util
+from src.util import Article, Util
 
 
 class Question:

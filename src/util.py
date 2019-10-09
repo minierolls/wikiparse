@@ -1,8 +1,10 @@
 from html.parser import HTMLParser
+import os
 import unicodedata
 
 import nltk
 import numpy as np
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 import tensorflow
 import tensorflow_hub
 
@@ -72,13 +74,13 @@ class Util:
             String representation of file
         """
         try:
-            f = open(article_path, "r", encoding="utf-8")
+            f = open(file_path, "r", encoding="utf-8")
             file_str = unicodedata.normalize("NFKD", f.read().strip())
             f.close()
         except:
+            print("Failed to open file " + file_path)
             return False
         return file_str
-
 
     def load_html_article(self, article_path):
         """
@@ -180,10 +182,11 @@ class Article:
         Args:
             article: Loaded article from Util.load_article()
         """
-        nltk.download("punkt")
-        nltk.download("averaged_perceptron_tagger")
-        nltk.download("maxent_ne_chunker")
-        nltk.download("words")
+
+        nltk.download("punkt", quiet=True)
+        nltk.download("averaged_perceptron_tagger", quiet=True)
+        nltk.download("maxent_ne_chunker", quiet=True)
+        nltk.download("words", quiet=True)
 
         self.sentences = []
         self.tokens = []

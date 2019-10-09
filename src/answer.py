@@ -1,7 +1,7 @@
 import nltk
 import numpy as np
 
-from util import Util, Article
+from src.util import Util, Article
 
 
 class Answer:
@@ -26,11 +26,12 @@ class Answer:
         Returns:
             Answer to question as string
         """
+        u = Util()
         question_embedding = u.embeddings([question])[0]
 
         sentences_list = []
 
-        for paragraph in art.sentences:
+        for paragraph in self.article.sentences:
             sentences_list += paragraph
 
         sentences_embeddings = u.embeddings(sentences_list)
