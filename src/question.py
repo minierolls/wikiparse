@@ -49,7 +49,7 @@ class Question:
                         questions.append(
                             sentence[ind:].replace(person, "Who", 1).replace(".", "?")
                         )
-        if len(questions) < num_questions:
+        while len(questions) < num_questions:
             questions += questions[0 : num_questions - len(questions)]
 
         return questions[0:num_questions]
@@ -57,6 +57,6 @@ class Question:
 
 if __name__ == "__main__":
     u = Util()
-    a = Article(u.load_txt_article("articles/Development_data/set1/set1/a1.txt"))
+    a = Article(u.load_txt_article("../articles/Development_data/set1/set1/a1.txt"))
     q = Question(a)
     print(q.generate(5))
