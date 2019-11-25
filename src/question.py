@@ -24,31 +24,24 @@ class Question:
             List of questions as strings
         """
         questions = []
-        for i in range(len(self.article.entities)):
-            paragraph_entity = self.article.entities[i]
-            for j in range(len(paragraph_entity)):
-                sentence_entity = self.article.entities[i][j]
-                people = []
-                for entity in sentence_entity:
-                    if entity[1] == "PERSON":
-                        people.append(entity[0])
-                sentence = self.article.sentences[i][j]
-                tagged_tokens = self.article.tagged_tokens[i][j]
-                for person in people:
-                    ind = sentence.find(person)
-                    next_word_start = ind + len(person) + 1
-                    next_word_end = sentence.find(" ", next_word_start)
-                    next_word = sentence[next_word_start:next_word_end]
-                    can_replace = False
-                    for tagged_token in tagged_tokens:
-                        if tagged_token[0] == next_word and tagged_token[1].startswith(
-                            "VB"
-                        ):
-                            can_replace = True
-                    if can_replace:
-                        questions.append(
-                            sentence[ind:].replace(person, "Who", 1).replace(".", "?")
-                        )
+        people = self.article.get_entities_of_type("PERSON")
+        for person in people:
+            sentences = self.article.search_token(person)
+            for (paragraph_index, sentence_index, sentence) in sentences:
+                ind = sentence.find(person)
+                next_word_start = ind + len(person) + 1
+                next_word_end = sentence.find(" ", next_word_start)
+                next_word = sentence[next_word_start:next_word_end]
+                tokens = self.article.tokens[paragraph_index][sentence_index]
+                can_replace = False
+                for token in tokens:
+                    if token.text == next_word and (token.tag_).startswith("VB") and not token.tag_ == "VBG" and not token.tag_ == "VBP":
+                        can_replace = True
+                if can_replace:
+                    questions.append(
+                        sentence[ind:].replace(person, "Who", 1).replace(".", "?")
+                    )
+
         while len(questions) < num_questions:
             questions += questions[0 : num_questions - len(questions)]
 
@@ -57,6 +50,6 @@ class Question:
 
 if __name__ == "__main__":
     u = Util()
-    a = Article(u.load_txt_article("../articles/Development_data/set1/set1/a1.txt"))
+    a = Article(u.load_txt_article("../articles/Development_data/set4/set4/a1.txt"))
     q = Question(a)
     print(q.generate(5))

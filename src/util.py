@@ -2,7 +2,7 @@ from html.parser import HTMLParser
 import os
 import unicodedata
 
-import nltk
+import spacy
 import numpy as np
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 import tensorflow
@@ -62,6 +62,7 @@ class Util:
         self.embeddings_model = tensorflow_hub.load(
             "https://tfhub.dev/google/tf2-preview/nnlm-en-dim128-with-normalization/1"
         )
+
 
     def open_utf_file(self, file_path):
         """
@@ -172,48 +173,34 @@ class Article:
     def __init__(self, article):
         """
         Initializes an Article with the following fields:
-            sentences: A list where the ith element is the list of sentences in the ith paragraph
-            tokens: a list where the ith element is a list of token lists for the ith paragraph
-            tagged_tokens: a list where the ith element is a list of tagged token lists for the ith paragraph.
-                    A tagged token is a tuple of the form (token, tag)
-            entities: a list where the ith element is a list of entity lists for the ith paragraph.
-                A entity is a tuple of the form (token, label)
+            sentences: A list where the ith element is the list of spacy sentences in the ith paragraph
+            tokens: a list where the ith element is a list of spacy token lists for the ith paragraph
+            entities: a list where the ith element is a list of spacy entities for the ith paragraph.
 
         Args:
             article: Loaded article from Util.load_article()
         """
-
-        nltk.download("punkt", quiet=True)
-        nltk.download("averaged_perceptron_tagger", quiet=True)
-        nltk.download("maxent_ne_chunker", quiet=True)
-        nltk.download("words", quiet=True)
-
+        self.nlp = spacy.load("en_core_web_lg")
         self.sentences = []
         self.tokens = []
-        self.tagged_tokens = []
         self.entities = []
         for element in article:
             if element[0] == "p":
-                paragraph_sents = nltk.sent_tokenize(element[1])
+                doc = self.nlp(element[1])
+                paragraph_sents = []
+                for sent in doc.sents:
+                    paragraph_sents.append(sent)
                 paragraph_tokens = []
-                paragraph_tagged_tokens = []
                 paragraph_entities = []
                 for sentence in paragraph_sents:
-                    token = nltk.word_tokenize(sentence)
-                    tagged_token = nltk.pos_tag(token)
-                    entity = nltk.chunk.ne_chunk(tagged_token)
+                    token = []
+                    entities = sentence.ents
+                    for word in sentence:
+                        token.append(word)
                     paragraph_tokens.append(token)
-                    paragraph_tagged_tokens.append(tagged_token)
-                    entity_list = []
-                    for chunk in entity:
-                        if hasattr(chunk, "label"):
-                            entity_list.append(
-                                (" ".join(c[0] for c in chunk), chunk.label())
-                            )
-                    paragraph_entities.append(entity_list)
+                    paragraph_entities.append(entities)
                 self.sentences.append(paragraph_sents)
                 self.tokens.append(paragraph_tokens)
-                self.tagged_tokens.append(paragraph_tagged_tokens)
                 self.entities.append(paragraph_entities)
 
     def search_token(self, token):
@@ -232,8 +219,8 @@ class Article:
 
         for paragraph_index, paragraph in enumerate(self.sentences):
             for sentence_index, sentence in enumerate(paragraph):
-                if token in sentence:
-                    out_list.append((paragraph_index, sentence_index, sentence))
+                if token in sentence.text:
+                    out_list.append((paragraph_index, sentence_index, sentence.text))
 
         return out_list
 
@@ -252,8 +239,8 @@ class Article:
         for paragraph in self.entities:
             for sentence in paragraph:
                 for entity in sentence:
-                    if entity[1] == entity_type and entity[0] not in out_list:
-                        out_list.append(entity[0])
+                    if entity.label_ == entity_type and entity.text not in out_list:
+                        out_list.append(entity.text)
         return out_list
 
 

@@ -1,7 +1,6 @@
-import nltk
 import numpy as np
 
-from src.util import Util, Article
+from util import Util, Article
 
 
 class Answer:
