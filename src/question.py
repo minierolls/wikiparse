@@ -1,5 +1,5 @@
 from src.util import Article, Util
-
+import string
 
 class Question:
     """Generate questions from the initialized article."""
@@ -38,10 +38,13 @@ class Question:
                     if token.text == next_word and (token.tag_).startswith("VB") and not token.tag_ == "VBG" and not token.tag_ == "VBP":
                         can_replace = True
                 if can_replace:
-                    questions.append(
-                        sentence[ind:].replace(person, "Who", 1).replace(".", "?")
-                    )
-
+                    punctuation = "!\"#&'*+,/:;<=>?@[\]^_`{|}~"
+                    sentence = sentence.translate(str.maketrans(punctuation, '?' * len(punctuation)))
+                    s_end = sentence.find("?", ind) + 1
+                    question = sentence[ind:s_end].replace(person, "Who", 1)
+                    if s_end == 0:
+                        question = sentence[ind:].replace(person, "Who", 1).replace(".", "?")
+                    questions.append(question)
         while len(questions) < num_questions:
             questions += questions[0 : num_questions - len(questions)]
 
