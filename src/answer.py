@@ -1,6 +1,6 @@
 import numpy as np
 
-from util import Util, Article
+from src.util import Util, Article
 
 
 class Answer:
@@ -31,7 +31,8 @@ class Answer:
         sentences_list = []
 
         for paragraph in self.article.sentences:
-            sentences_list += paragraph
+            paragraph_text = [s.text for s in paragraph]
+            sentences_list += paragraph_text
 
         sentences_embeddings = u.embeddings(sentences_list)
 
@@ -49,7 +50,7 @@ class Answer:
 
 if __name__ == "__main__":
     u = Util()
-    art = Article(u.load_txt_article("articles/Development_data/set1/set1/a1.txt"))
+    art = Article(u.load_txt_article("../articles/Development_data/set1/set1/a1.txt"))
     a = Answer(art)
     q = "Who was the next great pyramid builder?"
     print(a.answer(q))
