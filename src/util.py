@@ -4,9 +4,14 @@ import unicodedata
 
 import spacy
 import numpy as np
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
-import tensorflow
-import tensorflow_hub
+# os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
+# import tensorflow
+# import tensorflow_hub
+import torch
+from transformers import BertModel, BertTokenizer
+import logging
+logging.basicConfig(level=logging.FATAL)
+torch.no_grad()
 
 
 class ArticleParser(HTMLParser):
@@ -59,10 +64,8 @@ class Util:
         """
         Create a new instance of the Util class.
         """
-        self.embeddings_model = tensorflow_hub.load(
-            "https://tfhub.dev/google/tf2-preview/nnlm-en-dim128-with-normalization/1"
-        )
-
+        self.embeddings_model = BertModel.from_pretrained("bert-large-uncased").eval()
+        self.embeddings_tokenizer = BertTokenizer.from_pretrained("bert-large-uncased")
 
     def open_utf_file(self, file_path):
         """
@@ -152,19 +155,24 @@ class Util:
 
         return article_out
 
-    def embeddings(self, sentences):
+    def tokenize(self, sentence):
+        return self.embeddings_tokenizer.tokenize(sentence)
+
+    def embeddings(self, sentence):
         """
-        Return word embeddings for provided sequences of tokens.
+        Return word embeddings for provided sequence of tokens.
 
         Args:
-            sentences: A list of sentence strings for which to find word embeddings
+            sentence: A sentence string for which to find word embeddings
 
         Returns:
-            Word embeddings of provided sentences as NumPy array
+            Word embeddings of provided sentence as NumPy array
         """
-        tensors = self.embeddings_model(sentences)
+        tensor = torch.tensor(self.embeddings_tokenizer.encode(sentence)).unsqueeze(0)
+        outputs = self.embeddings_model(tensor)
 
-        return tensors.numpy()
+        result = outputs[0].detach().numpy()
+        return result
 
 
 class Article:

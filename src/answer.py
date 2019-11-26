@@ -26,19 +26,23 @@ class Answer:
             Answer to question as string
         """
         u = Util()
-        question_embedding = u.embeddings([question])[0]
+        question_embedding = u.embeddings(question)[0]
 
         sentences_list = []
 
         for paragraph in self.article.sentences:
-            sentences_list += paragraph
+            paragraph_text = [s.text for s in paragraph]
+            sentences_list += paragraph_text
 
-        sentences_embeddings = u.embeddings(sentences_list)
+        sentences_embeddings = []
+        for sentence in sentences_list:
+            sentences_embeddings.append(u.embeddings(sentence)[0])
 
         distances = []
         for i, embedding in enumerate(sentences_embeddings):
-            diffs = question_embedding - embedding
-            dist = sum(np.abs(diffs))
+            denom = question_embedding.size * embedding.size
+            diffs = np.dot(question_embedding, embedding.T) / denom
+            dist = np.average(diffs)
 
             distances.append((dist, sentences_list[i]))
 
