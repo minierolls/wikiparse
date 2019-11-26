@@ -1,6 +1,6 @@
 import numpy as np
 
-from util import Util, Article
+from src.util import Util, Article
 
 
 class Answer:
@@ -53,7 +53,7 @@ class Answer:
 
 if __name__ == "__main__":
     u = Util()
-    art = Article(u.load_txt_article("articles/Development_data/set1/set1/a1.txt"))
+    art = Article(u.load_txt_article("../articles/Development_data/set1/set1/a1.txt"))
     a = Answer(art)
     q = "Who was the next great pyramid builder?"
     print(a.answer(q))
