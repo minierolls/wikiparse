@@ -64,8 +64,8 @@ class Util:
         """
         Create a new instance of the Util class.
         """
-        self.embeddings_model = BertModel.from_pretrained("bert-large-uncased").eval()
-        self.embeddings_tokenizer = BertTokenizer.from_pretrained("bert-large-uncased")
+        self.embeddings_model = BertModel.from_pretrained("bert-base-multilingual-cased").eval()
+        self.embeddings_tokenizer = BertTokenizer.from_pretrained("bert-base-multilingual-cased")
 
     def open_utf_file(self, file_path):
         """
@@ -188,7 +188,9 @@ class Article:
         Args:
             article: Loaded article from Util.load_article()
         """
-        self.nlp = spacy.load("en_core_web_lg")
+        self.nlp = spacy.load("en_core_web_lg") # TODO: This has problems splitting sentences
+                                                #       in places they should not be split.
+                                                #       Try different models.
         self.sentences = []
         self.tokens = []
         self.entities = []

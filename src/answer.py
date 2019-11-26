@@ -1,6 +1,6 @@
 import numpy as np
 
-from src.util import Util, Article
+from util import Util, Article
 
 
 class Answer:
@@ -40,6 +40,10 @@ class Answer:
 
         distances = []
         for i, embedding in enumerate(sentences_embeddings):
+            # TODO: There is a problem with this "cosine similarity", because
+            #       taking the similarity with the transposition is not actually
+            #       taking the similarity between sentences. Investigate the Sif
+            #       embedding
             denom = question_embedding.size * embedding.size
             diffs = np.dot(question_embedding, embedding.T) / denom
             dist = np.average(diffs)
@@ -53,7 +57,7 @@ class Answer:
 
 if __name__ == "__main__":
     u = Util()
-    art = Article(u.load_txt_article("../articles/Development_data/set1/set1/a1.txt"))
+    art = Article(u.load_txt_article("articles/Development_data/set1/set1/a1.txt"))
     a = Answer(art)
     q = "Who was the next great pyramid builder?"
     print(a.answer(q))
