@@ -5,6 +5,6 @@
 
 ## Dependencies
 
-- NLTK
-- TensorFlow
-- TensorFlow Hub
+- spaCy
+- PyTorch
+- Transformers
