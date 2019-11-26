@@ -1,10 +1,5 @@
-<<<<<<< HEAD
 from util import Article, Util
 
-=======
-from src.util import Article, Util
-import string
->>>>>>> 493255cd2b45b45201cb792dec4460bb52d179b2
 
 class Question:
     """Generate questions from the initialized article."""
