@@ -4,14 +4,17 @@ import unicodedata
 
 import spacy
 import numpy as np
-# os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
-# import tensorflow
-# import tensorflow_hub
-import torch
-from transformers import BertModel, BertTokenizer
-import logging
-logging.basicConfig(level=logging.FATAL)
-torch.no_grad()
+
+os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
+import tensorflow
+import tensorflow_hub
+import tensorflow_text
+
+# import torch
+# from transformers import BertModel, BertTokenizer, BertForQuestionAnswering
+# import logging
+# logging.basicConfig(level=logging.FATAL)
+# torch.no_grad()
 
 
 class ArticleParser(HTMLParser):
@@ -64,8 +67,9 @@ class Util:
         """
         Create a new instance of the Util class.
         """
-        self.embeddings_model = BertModel.from_pretrained("bert-base-multilingual-cased").eval()
-        self.embeddings_tokenizer = BertTokenizer.from_pretrained("bert-base-multilingual-cased")
+        self.embeddings_model = tensorflow_hub.load(
+            "https://tfhub.dev/google/universal-sentence-encoder-multilingual-large/2"
+        )
 
     def open_utf_file(self, file_path):
         """
@@ -150,15 +154,15 @@ class Util:
             else:
                 article_out.append(("h2", line))
             # All content after "References" header is considered irrelevant
-            if line == "References":
+            if line.lower() == "references" or line.lower() == "see also":
                 break
 
         return article_out
 
-    def tokenize(self, sentence):
-        return self.embeddings_tokenizer.tokenize(sentence)
+    # def tokenize(self, sentence):
+    #     return self.embeddings_tokenizer.tokenize(sentence)
 
-    def embeddings(self, sentence):
+    def embeddings(self, sentences):
         """
         Return word embeddings for provided sequence of tokens.
 
@@ -168,11 +172,9 @@ class Util:
         Returns:
             Word embeddings of provided sentence as NumPy array
         """
-        tensor = torch.tensor(self.embeddings_tokenizer.encode(sentence)).unsqueeze(0)
-        outputs = self.embeddings_model(tensor)
+        tensors = self.embeddings_model(sentences)["outputs"]
 
-        result = outputs[0].detach().numpy()
-        return result
+        return tensors
 
 
 class Article:
@@ -188,9 +190,7 @@ class Article:
         Args:
             article: Loaded article from Util.load_article()
         """
-        self.nlp = spacy.load("en_core_web_lg") # TODO: This has problems splitting sentences
-                                                #       in places they should not be split.
-                                                #       Try different models.
+        self.nlp = spacy.load("en_core_web_lg")
         self.sentences = []
         self.tokens = []
         self.entities = []
