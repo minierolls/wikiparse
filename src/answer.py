@@ -56,7 +56,7 @@ class Answer:
 
 if __name__ == "__main__":
     u = Util()
-    art = Article(u.load_txt_article("articles/Development_data/set4/set4/a1.txt"))
+    art = Article(u.load_txt_article("../articles/Development_data/set4/set4/a1.txt"))
     a = Answer(art)
     q = "Who studied the stars of the southern hemisphere from 1750 until 1754 from Cape of Good Hope?"
     print(a.answer(q))

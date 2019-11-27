@@ -247,7 +247,7 @@ class Article:
 
 if __name__ == "__main__":
     util = Util()
-    parsed_article = util.load_txt_article("articles/Development_data/set1/set1/a1.txt")
+    parsed_article = util.load_txt_article("../articles/Development_data/set1/set1/a1.txt")
     f = open("a1.txt", "w", encoding="utf-8")
     for segment in parsed_article:
         f.write(segment[1])

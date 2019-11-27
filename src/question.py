@@ -72,6 +72,30 @@ class Question:
                         question = sentence[ind:].replace(obj, "What", 1).replace(".", "?")
                     questions.append(question)
 
+        locations = self.article.get_entities_of_type("GPE")
+        locations += self.article.get_entities_of_type("LOC")
+        locations += self.article.get_entities_of_type("FAC")
+        for loc in locations:
+            sentences = self.article.search_token(loc)
+            for (paragraph_index, sentence_index, sentence) in sentences:
+                ind = sentence.find(loc)
+                next_word_start = ind + len(loc) + 1
+                next_word_end = sentence.find(" ", next_word_start)
+                next_word = sentence[next_word_start:next_word_end]
+                tokens = self.article.tokens[paragraph_index][sentence_index]
+                can_replace = False
+                for token in tokens:
+                    if token.text == next_word and (token.tag_).startswith("VB") and not token.tag_=="VBG" and not token.tag_ == "VBP":
+                        can_replace = True
+                if can_replace:
+                    punctuation = "!\"#&'*+,/:;<=>?@[\\]^_`{|}~"
+                    sentence = sentence.translate(str.maketrans(punctuation, '?' * len(punctuation)))
+                    s_end = sentence.find("?", ind) + 1
+                    question = sentence[ind:s_end].replace(loc, "Where", 1)
+                    if s_end == 0:
+                        question = sentence[ind:].replace(loc, "Where", 1).replace(".", "?")
+                    questions.append(question)
+
         # Scoring questions based on answer performance
         a = Answer(self.article)
         question_scores = []
@@ -90,6 +114,6 @@ class Question:
 
 if __name__ == "__main__":
     u = Util()
-    a = Article(u.load_txt_article("articles/Development_data/set4/set4/a1.txt"))
+    a = Article(u.load_txt_article("../articles/Development_data/set4/set4/a1.txt"))
     q = Question(a)
     print(q.generate(5))
