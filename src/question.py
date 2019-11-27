@@ -25,6 +25,8 @@ class Question:
             List of questions as strings
         """
         questions = []
+
+        # Who questions
         people = self.article.get_entities_of_type("PERSON")
         for person in people:
             sentences = self.article.search_token(person)
@@ -47,6 +49,30 @@ class Question:
                         question = sentence[ind:].replace(person, "Who", 1).replace(".", "?")
                     questions.append(question)
 
+        objects = self.article.get_entities_of_type("EVENT")
+        objects += self.article.get_entities_of_type("WORK_OF_ART")
+        for obj in objects:
+            sentences = self.article.search_token(obj)
+            for (paragraph_index, sentence_index, sentence) in sentences:
+                ind = sentence.find(obj)
+                next_word_start = ind + len(obj) + 1
+                next_word_end = sentence.find(" ", next_word_start)
+                next_word = sentence[next_word_start:next_word_end]
+                tokens = self.article.tokens[paragraph_index][sentence_index]
+                can_replace = False
+                for token in tokens:
+                    if token.text == next_word and (token.tag_).startswith("VB") and not token.tag_=="VBG" and not token.tag_ == "VBP":
+                        can_replace = True
+                if can_replace:
+                    punctuation = "!\"#&'*+,/:;<=>?@[\\]^_`{|}~"
+                    sentence = sentence.translate(str.maketrans(punctuation, '?' * len(punctuation)))
+                    s_end = sentence.find("?", ind) + 1
+                    question = sentence[ind:s_end].replace(obj, "What", 1)
+                    if s_end == 0:
+                        question = sentence[ind:].replace(obj, "What", 1).replace(".", "?")
+                    questions.append(question)
+
+        # Scoring questions based on answer performance
         a = Answer(self.article)
         question_scores = []
         for question in questions:

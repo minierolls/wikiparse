@@ -10,12 +10,6 @@ import tensorflow
 import tensorflow_hub
 import tensorflow_text
 
-# import torch
-# from transformers import BertModel, BertTokenizer, BertForQuestionAnswering
-# import logging
-# logging.basicConfig(level=logging.FATAL)
-# torch.no_grad()
-
 
 class ArticleParser(HTMLParser):
     """An extension of the Python HTMLParser to parse articles."""
@@ -158,9 +152,6 @@ class Util:
                 break
 
         return article_out
-
-    # def tokenize(self, sentence):
-    #     return self.embeddings_tokenizer.tokenize(sentence)
 
     def embeddings(self, sentences):
         """
