@@ -1,5 +1,5 @@
-from util import Article, Util
-from answer import Answer
+from src.util import Article, Util
+from src.answer import Answer
 
 
 class Question:
@@ -178,6 +178,8 @@ class Question:
                     if s_end == 0:
                         question = sentence[ind:].replace(loc, "Where", 1).replace(".", "?")
                     questions.append(question)
+
+        questions = list(set(questions))
 
         # Scoring questions based on answer performance
         a = Answer(self.article)

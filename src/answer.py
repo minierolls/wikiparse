@@ -1,6 +1,6 @@
 import numpy as np
 
-from util import Util, Article
+from src.util import Util, Article
 
 
 class Answer:
