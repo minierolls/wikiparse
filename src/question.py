@@ -46,7 +46,7 @@ class Question:
                     ):
                         can_replace = True
                 if can_replace:
-                    punctuation = "!\"#&'*+,/:;<=>?@[\\]^_`{|}~"
+                    punctuation = "!#&'*+,/:;<=>?@[\\]^_`{|}~"
                     sentence = sentence.translate(
                         str.maketrans(punctuation, "?" * len(punctuation))
                     )
@@ -60,7 +60,7 @@ class Question:
 
                 # Binary questions
                 if next_word.lower() == "is" or next_word == "was":
-                    punctuation = "!\"#&'*+,/:;<=>?@[\\]^_`{|}~"
+                    punctuation = "!#&'*+,/:;<=>?@[\\]^_`{|}~"
                     sentence = sentence.translate(
                         str.maketrans(punctuation, "?" * len(punctuation))
                     )
@@ -112,7 +112,7 @@ class Question:
                     ):
                         can_replace = True
                 if can_replace:
-                    punctuation = "!\"#&'*+,/:;<=>?@[\\]^_`{|}~"
+                    punctuation = "!#&'*+,/:;<=>?@[\\]^_`{|}~"
                     sentence = sentence.translate(
                         str.maketrans(punctuation, "?" * len(punctuation))
                     )
@@ -126,7 +126,7 @@ class Question:
 
                 # Binary questions
                 if next_word.lower() == "is" or next_word == "was":
-                    punctuation = "!\"#&'*+,/:;<=>?@[\\]^_`{|}~"
+                    punctuation = "!#&'*+,/:;<=>?@[\\]^_`{|}~"
                     sentence = sentence.translate(
                         str.maketrans(punctuation, "?" * len(punctuation))
                     )
