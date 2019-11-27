@@ -1,4 +1,5 @@
 from util import Article, Util
+from answer import Answer
 
 
 class Question:
@@ -45,6 +46,16 @@ class Question:
                     if s_end == 0:
                         question = sentence[ind:].replace(person, "Who", 1).replace(".", "?")
                     questions.append(question)
+
+        a = Answer(self.article)
+        question_scores = []
+        for question in questions:
+            _, score = a.answer(question, return_score=True)
+            question_scores.append((question, score))
+
+        question_scores.sort(key=lambda x: x[1], reverse=True)
+        questions = [x[0] for x in question_scores]
+
         while len(questions) < num_questions:
             questions += questions[0 : num_questions - len(questions)]
 

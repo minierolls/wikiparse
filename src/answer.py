@@ -15,7 +15,7 @@ class Answer:
         """
         self.article = article
 
-    def answer(self, question):
+    def answer(self, question, return_score=False):
         """
         Answer the given question.
 
@@ -45,7 +45,14 @@ class Answer:
 
         distances.sort(key=lambda x: x[0], reverse=True)
 
-        return distances[0][1]
+        most_similar_sentence = distances[0][1]
+        most_similar_score = distances[0][0]
+
+        if return_score:
+            return (most_similar_sentence, most_similar_score)
+
+        return most_similar_sentence
+
 
 if __name__ == "__main__":
     u = Util()
