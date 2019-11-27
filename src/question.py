@@ -38,19 +38,62 @@ class Question:
                 tokens = self.article.tokens[paragraph_index][sentence_index]
                 can_replace = False
                 for token in tokens:
-                    if token.text == next_word and (token.tag_).startswith("VB") and not token.tag_ == "VBG" and not token.tag_ == "VBP":
+                    if (
+                        token.text == next_word
+                        and (token.tag_).startswith("VB")
+                        and not token.tag_ == "VBG"
+                        and not token.tag_ == "VBP"
+                    ):
                         can_replace = True
                 if can_replace:
                     punctuation = "!\"#&'*+,/:;<=>?@[\\]^_`{|}~"
-                    sentence = sentence.translate(str.maketrans(punctuation, '?' * len(punctuation)))
+                    sentence = sentence.translate(
+                        str.maketrans(punctuation, "?" * len(punctuation))
+                    )
                     s_end = sentence.find("?", ind) + 1
                     question = sentence[ind:s_end].replace(person, "Who", 1)
                     if s_end == 0:
-                        question = sentence[ind:].replace(person, "Who", 1).replace(".", "?")
+                        question = (
+                            sentence[ind:].replace(person, "Who", 1).replace(".", "?")
+                        )
                     questions.append(question)
 
+                # Binary questions
+                if next_word.lower() == "is" or next_word == "was":
+                    punctuation = "!\"#&'*+,/:;<=>?@[\\]^_`{|}~"
+                    sentence = sentence.translate(
+                        str.maketrans(punctuation, "?" * len(punctuation))
+                    )
+                    s_end = sentence.find("?", ind) + 1
+                    question = sentence[ind:s_end]
+                    if s_end == 0:
+                        question = sentence[ind:].replace(".", "?")
+
+                    question = question.split()
+                    bin_question = []
+                    person_ind = None
+                    bin_word = None
+                    for i, word in enumerate(question):
+                        if person_ind is None and word == person:
+                            person_ind = i
+                        if (
+                            person_ind is not None
+                            and i == person_ind + 1
+                            and (word.lower() == "is" or word.lower() == "was")
+                        ):
+                            bin_word = word
+                            continue
+                        bin_question.append(word)
+                    if bin_word is not None:
+                        bin_question.insert(person_ind, bin_word.title())
+                        question = " ".join(bin_question)
+                        questions.append(question)
+
+        # What questions
         objects = self.article.get_entities_of_type("EVENT")
         objects += self.article.get_entities_of_type("WORK_OF_ART")
+        objects += self.article.get_entities_of_type("FAC")
+        objects = list(set(objects))
         for obj in objects:
             sentences = self.article.search_token(obj)
             for (paragraph_index, sentence_index, sentence) in sentences:
@@ -61,16 +104,56 @@ class Question:
                 tokens = self.article.tokens[paragraph_index][sentence_index]
                 can_replace = False
                 for token in tokens:
-                    if token.text == next_word and (token.tag_).startswith("VB") and not token.tag_=="VBG" and not token.tag_ == "VBP":
+                    if (
+                        token.text == next_word
+                        and (token.tag_).startswith("VB")
+                        and not token.tag_ == "VBG"
+                        and not token.tag_ == "VBP"
+                    ):
                         can_replace = True
                 if can_replace:
                     punctuation = "!\"#&'*+,/:;<=>?@[\\]^_`{|}~"
-                    sentence = sentence.translate(str.maketrans(punctuation, '?' * len(punctuation)))
+                    sentence = sentence.translate(
+                        str.maketrans(punctuation, "?" * len(punctuation))
+                    )
                     s_end = sentence.find("?", ind) + 1
                     question = sentence[ind:s_end].replace(obj, "What", 1)
                     if s_end == 0:
-                        question = sentence[ind:].replace(obj, "What", 1).replace(".", "?")
+                        question = (
+                            sentence[ind:].replace(obj, "What", 1).replace(".", "?")
+                        )
                     questions.append(question)
+
+                # Binary questions
+                if next_word.lower() == "is" or next_word == "was":
+                    punctuation = "!\"#&'*+,/:;<=>?@[\\]^_`{|}~"
+                    sentence = sentence.translate(
+                        str.maketrans(punctuation, "?" * len(punctuation))
+                    )
+                    s_end = sentence.find("?", ind) + 1
+                    question = sentence[ind:s_end]
+                    if s_end == 0:
+                        question = sentence[ind:].replace(".", "?")
+
+                    question = question.split()
+                    bin_question = []
+                    person_ind = None
+                    bin_word = None
+                    for i, word in enumerate(question):
+                        if person_ind is None and word == person:
+                            person_ind = i
+                        if (
+                            person_ind is not None
+                            and i == person_ind + 1
+                            and (word.lower() == "is" or word.lower() == "was")
+                        ):
+                            bin_word = word
+                            continue
+                        bin_question.append(word)
+                    if bin_word is not None:
+                        bin_question.insert(person_ind, bin_word.title())
+                        question = " ".join(bin_question)
+                        questions.append(question)
 
         # Scoring questions based on answer performance
         a = Answer(self.article)
